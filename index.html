@@ -1,0 +1,2169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ammachi Kolukattai - Daily Sales & POS</title>
+    <style>
+        /* ==========================================================================
+           1. CSS VARIABLES & BASE STYLES
+           ========================================================================== */
+        :root {
+            --primary: #6F1D33;
+            --secondary: #C8812D;
+            --natural: #2A4B33;
+            --background: #FDFBF2;
+            --inner-neutral: #FDFBF2;
+            --outline: #3A2318;
+            --surface: #FFFFFF;
+            --surface-muted: #F8F4EA;
+            --border-light: rgba(58, 35, 24, 0.15);
+            --shadow-sm: 0 2px 4px rgba(58, 35, 24, 0.05);
+            --shadow-md: 0 4px 12px rgba(58, 35, 24, 0.08);
+            --shadow-lg: 0 8px 24px rgba(58, 35, 24, 0.12);
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --radius-pill: 50px;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--background);
+            color: var(--outline);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            padding-bottom: 60px;
+        }
+
+        /* Container & Grid Layouts */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-subtitle {
+            font-size: 0.9rem;
+            color: var(--outline);
+            opacity: 0.8;
+            margin-bottom: 1.25rem;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1.25rem;
+        }
+
+        /* Buttons & Forms */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1.25rem;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: #FFFFFF;
+        }
+
+        .btn-primary:hover {
+            background-color: #581628;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: #FFFFFF;
+        }
+
+        .btn-secondary:hover {
+            background-color: #B27024;
+        }
+
+        .btn-natural {
+            background-color: var(--natural);
+            color: #FFFFFF;
+        }
+
+        .btn-natural:hover {
+            background-color: #203A27;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--outline);
+            color: var(--outline);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(58, 35, 24, 0.05);
+        }
+
+        .btn-sm {
+            padding: 0.35rem 0.75rem;
+            font-size: 0.85rem;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.625rem 0.875rem;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            background-color: var(--surface);
+            color: var(--outline);
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(111, 29, 51, 0.15);
+        }
+
+        /* ==========================================================================
+           2. HEADER & NAVIGATION
+           ========================================================================== */
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background-color: var(--surface);
+            border-bottom: 2px solid var(--primary);
+            box-shadow: var(--shadow-md);
+        }
+
+        .header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 70px;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--primary);
+        }
+
+        .logo-img {
+            height: 60px;
+            width: auto;
+            max-width: 160px;
+            object-fit: contain;
+        }
+
+        .logo-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        .nav-desktop {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--outline);
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            padding: 0.5rem 0.25rem;
+            position: relative;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary);
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--primary);
+            border-radius: 2px;
+        }
+
+        .hamburger-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--outline);
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        /* Mobile Drawer */
+        .mobile-drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1050;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .mobile-drawer-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .mobile-drawer {
+            position: fixed;
+            top: 0;
+            right: -280px;
+            width: 280px;
+            height: 100%;
+            background: var(--surface);
+            z-index: 1060;
+            box-shadow: var(--shadow-lg);
+            transition: var(--transition);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mobile-drawer.active {
+            right: 0;
+        }
+
+        .drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .drawer-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--outline);
+            cursor: pointer;
+        }
+
+        .mobile-nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .mobile-nav-link {
+            text-decoration: none;
+            color: var(--outline);
+            font-weight: 600;
+            font-size: 1.1rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed var(--border-light);
+        }
+
+        /* ==========================================================================
+           3. HERO & METRICS DASHBOARD
+           ========================================================================== */
+        .hero-section {
+            padding: 2rem 0 1.5rem 0;
+            background: linear-gradient(180deg, rgba(200, 129, 45, 0.08) 0%, rgba(253, 251, 242, 0) 100%);
+            border-bottom: 1px solid var(--border-light);
+            margin-bottom: 2rem;
+        }
+
+        .hero-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-text h1 {
+            font-size: 2rem;
+            color: var(--primary);
+            line-height: 1.2;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-text p {
+            color: var(--outline);
+            opacity: 0.85;
+            font-size: 1rem;
+            max-width: 600px;
+        }
+
+        /* Summary Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+        }
+
+        .metric-card {
+            background: var(--surface);
+            border: 1px solid var(--border-light);
+            border-left: 4px solid var(--primary);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .metric-card.secondary { border-left-color: var(--secondary); }
+        .metric-card.natural { border-left-color: var(--natural); }
+        .metric-card.outline { border-left-color: var(--outline); }
+
+        .metric-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+            color: var(--outline);
+            opacity: 0.7;
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-value {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--outline);
+        }
+
+        /* ==========================================================================
+           4. POS / SALES ENTRY SECTION
+           ========================================================================== */
+        .sales-entry-grid {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 1.5rem;
+            align-items: start;
+        }
+
+        /* Customer Selector Bar */
+        .customer-bar {
+            margin-bottom: 1.25rem;
+        }
+
+        .customer-grid {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .customer-pill {
+            flex: 0 0 auto;
+            padding: 0.5rem 0.875rem;
+            border: 1px solid var(--border-light);
+            background: var(--surface);
+            border-radius: var(--radius-pill);
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+        }
+
+        .customer-pill:hover {
+            border-color: var(--secondary);
+            background: rgba(200, 129, 45, 0.05);
+        }
+
+        .customer-pill.active {
+            background: var(--primary);
+            color: #FFFFFF;
+            border-color: var(--primary);
+        }
+
+        .customer-pill .badge {
+            background: rgba(0,0,0,0.15);
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+        }
+
+        .customer-pill.active .badge {
+            background: var(--secondary);
+            color: #FFFFFF;
+        }
+
+        /* Product Selector Grid */
+        .product-search-box {
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1rem;
+            max-height: 520px;
+            overflow-y: auto;
+            padding-right: 0.25rem;
+        }
+
+        .pos-product-card {
+            background: var(--surface);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 0.875rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .pos-product-card.has-qty {
+            border-color: var(--secondary);
+            background-color: rgba(200, 129, 45, 0.03);
+            box-shadow: 0 0 0 1px var(--secondary);
+        }
+
+        .pos-prod-info {
+            margin-bottom: 0.75rem;
+        }
+
+        .pos-prod-name {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--outline);
+        }
+
+        .pos-prod-price {
+            font-weight: 600;
+            color: var(--secondary);
+            font-size: 0.9rem;
+        }
+
+        .qty-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--surface-muted);
+            border-radius: var(--radius-sm);
+            padding: 2px;
+            border: 1px solid var(--border-light);
+        }
+
+        .qty-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: var(--surface);
+            color: var(--outline);
+            font-weight: bold;
+            font-size: 1.1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .qty-btn:hover {
+            background: var(--primary);
+            color: #FFFFFF;
+        }
+
+        .qty-val {
+            font-weight: 700;
+            font-size: 0.95rem;
+            width: 30px;
+            text-align: center;
+        }
+
+        /* Order Checkout Panel */
+        .checkout-panel {
+            position: sticky;
+            top: 90px;
+            background: var(--surface);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .checkout-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--surface-muted);
+            padding-bottom: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .active-cust-display {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--primary);
+            background: rgba(111, 29, 51, 0.08);
+            padding: 0.25rem 0.6rem;
+            border-radius: var(--radius-pill);
+        }
+
+        .selection-group {
+            margin-bottom: 1rem;
+        }
+
+        .selection-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--outline);
+            opacity: 0.75;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .option-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 0.5rem;
+        }
+
+        .option-card {
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            padding: 0.5rem;
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: var(--surface);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .option-card:hover {
+            border-color: var(--secondary);
+        }
+
+        .option-card.selected {
+            border-color: var(--primary);
+            background-color: var(--primary);
+            color: #FFFFFF;
+        }
+
+        .cart-summary-list {
+            max-height: 140px;
+            overflow-y: auto;
+            border-top: 1px dashed var(--border-light);
+            border-bottom: 1px dashed var(--border-light);
+            padding: 0.5rem 0;
+            margin-bottom: 1rem;
+        }
+
+        .cart-item-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            margin-bottom: 0.35rem;
+        }
+
+        .total-box {
+            background: var(--surface-muted);
+            border-radius: var(--radius-sm);
+            padding: 0.875rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-light);
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        /* ==========================================================================
+           5. TODAY'S SALES & ANALYTICS
+           ========================================================================== */
+        .filter-bar {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+            background: var(--surface);
+            padding: 0.75rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-light);
+        }
+
+        .filter-bar select {
+            flex: 1;
+            min-width: 130px;
+        }
+
+        .sales-table-wrapper {
+            overflow-x: auto;
+            background: var(--surface);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+        }
+
+        .sales-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        .sales-table th {
+            background-color: var(--surface-muted);
+            color: var(--outline);
+            padding: 0.75rem 1rem;
+            font-weight: 700;
+            border-bottom: 2px solid var(--border-light);
+            white-space: nowrap;
+        }
+
+        .sales-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-light);
+            vertical-align: middle;
+        }
+
+        .sales-table tr:hover {
+            background-color: rgba(253, 251, 242, 0.6);
+        }
+
+        .badge-channel {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: var(--surface-muted);
+            border: 1px solid var(--border-light);
+        }
+
+        .badge-payment {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: rgba(42, 75, 51, 0.1);
+            color: var(--natural);
+        }
+
+        /* Analytics Breakdown */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+            margin-top: 1.5rem;
+        }
+
+        .progress-bar-container {
+            margin-bottom: 0.75rem;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .progress-track {
+            height: 8px;
+            background: var(--surface-muted);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--secondary);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-fill.natural { background: var(--natural); }
+        .progress-fill.primary { background: var(--primary); }
+
+        /* ==========================================================================
+           6. PRODUCTS GALLERY SECTION
+           ========================================================================== */
+        .catalog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .catalog-card {
+            background: var(--surface);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+        }
+
+        .catalog-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .catalog-img-wrapper {
+            height: 140px;
+            background: var(--surface-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .catalog-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .catalog-details {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .catalog-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .catalog-desc {
+            font-size: 0.8rem;
+            color: var(--outline);
+            opacity: 0.8;
+            margin-bottom: 0.75rem;
+            flex-grow: 1;
+        }
+
+        .catalog-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .catalog-price {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--natural);
+        }
+
+        /* ==========================================================================
+           7. MODALS, TOASTS & UTILITIES
+           ========================================================================== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-card {
+            background: var(--surface);
+            border-radius: var(--radius-md);
+            max-width: 500px;
+            width: 100%;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-lg);
+            transform: scale(0.9);
+            transition: var(--transition);
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 0.5rem;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .toast {
+            background: var(--outline);
+            color: #FFFFFF;
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-md);
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            animation: slideIn 0.3s forwards, fadeOut 0.3s 2.7s forwards;
+            border-left: 4px solid var(--natural);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2.5rem 1rem;
+            color: var(--outline);
+            opacity: 0.7;
+        }
+
+        .empty-state svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 0.5rem;
+            stroke: var(--outline);
+            opacity: 0.5;
+        }
+
+        /* Footer */
+        .site-footer {
+            margin-top: 4rem;
+            border-top: 1px solid var(--border-light);
+            padding: 2rem 0;
+            background: var(--surface);
+            font-size: 0.85rem;
+            color: var(--outline);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* ==========================================================================
+           8. RESPONSIVE BREAKPOINTS
+           ========================================================================== */
+        @media (max-width: 992px) {
+            .sales-entry-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .checkout-panel {
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-desktop { display: none; }
+            .hamburger-btn { display: block; }
+            .hero-text h1 { font-size: 1.5rem; }
+            .products-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+            .catalog-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==========================================================================
+       HEADER SECTION
+       ========================================================================== -->
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="#home" class="logo-container">
+                <img src="/asstes/logo.png" alt="Store Sales Management Logo" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <span class="logo-title" style="display:none;">StoreSales</span>
+            </a>
+
+            <nav class="nav-desktop">
+                <a href="#home" class="nav-link active">Home</a>
+                <a href="#pos" class="nav-link">New Sale</a>
+                <a href="#todays-sales" class="nav-link">Today's Sales</a>
+                <a href="#products" class="nav-link">Products</a>
+            </nav>
+
+            <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle Navigation Menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Drawer Overlay -->
+    <div class="mobile-drawer-overlay" id="drawerOverlay"></div>
+    <div class="mobile-drawer" id="mobileDrawer">
+        <div class="drawer-header">
+            <strong>Navigation</strong>
+            <button class="drawer-close" id="drawerCloseBtn">&times;</button>
+        </div>
+        <div class="mobile-nav-links">
+            <a href="#home" class="mobile-nav-link">Home</a>
+            <a href="#pos" class="mobile-nav-link">New Sale</a>
+            <a href="#todays-sales" class="mobile-nav-link">Today's Sales</a>
+            <a href="#products" class="mobile-nav-link">Products Catalog</a>
+            <a href="#settings" class="mobile-nav-link">Settings & Reset</a>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+       HERO & DASHBOARD SUMMARY SECTION
+       ========================================================================== -->
+    <section id="home" class="hero-section">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>Manage Your Store Sales Easily</h1>
+                    <p>Record daily customer transactions, track payments, monitor sales channels, and generate real-time performance summaries instantly.</p>
+                </div>
+                <div>
+                    <a href="#pos" class="btn btn-primary">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        Start New Sale
+                    </a>
+                </div>
+            </div>
+
+            <!-- Dynamic Executive Metrics Bar -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-title">Today's Sales</div>
+                    <div class="metric-value" id="dashTotalSales">₹0</div>
+                </div>
+                <div class="metric-card secondary">
+                    <div class="metric-title">Total Orders</div>
+                    <div class="metric-value" id="dashTotalOrders">0</div>
+                </div>
+                <div class="metric-card natural">
+                    <div class="metric-title">Items Sold</div>
+                    <div class="metric-value" id="dashItemsSold">0</div>
+                </div>
+                <div class="metric-card outline">
+                    <div class="metric-title">Customers Served</div>
+                    <div class="metric-value" id="dashCustServed">0</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-title">Cash Revenue</div>
+                    <div class="metric-value" id="dashCashSales">₹0</div>
+                </div>
+                <div class="metric-card secondary">
+                    <div class="metric-title">GPay Revenue</div>
+                    <div class="metric-value" id="dashGPaySales">₹0</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main class="container">
+        <!-- ==========================================================================
+           SALES ENTRY (POS) SECTION
+           ========================================================================== -->
+        <section id="pos" style="margin-bottom: 3rem;">
+            <div class="section-title">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                Record New Sale
+            </div>
+            <div class="section-subtitle">Select a customer, add products, specify sales channel and payment, then commit the order.</div>
+
+            <!-- Customer Switcher Bar -->
+            <div class="customer-bar">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                    <span class="selection-label" style="margin-bottom:0;">Select Customer Slot (50 Slots Available)</span>
+                    <button class="btn btn-outline btn-sm" onclick="promptRenameCustomer()">Rename Current Customer</button>
+                </div>
+                <div class="customer-grid" id="customerPillGrid">
+                    <!-- Customer Pills 01 - 50 Generated by JS -->
+                </div>
+            </div>
+
+            <!-- Main POS Workplace Grid -->
+            <div class="sales-entry-grid">
+                <!-- Left: Products Selection Area -->
+                <div>
+                    <div class="product-search-box">
+                        <input type="text" id="productSearchInput" class="form-control" placeholder="Search products by name..." oninput="filterProducts()">
+                    </div>
+
+                    <div class="products-grid" id="posProductsGrid">
+                        <!-- Products rendered dynamically -->
+                    </div>
+                </div>
+
+                <!-- Right: Checkout & Details Panel -->
+                <div class="checkout-panel">
+                    <div class="checkout-header">
+                        <span style="font-weight:700;">Current Order</span>
+                        <span class="active-cust-display" id="activeCustomerDisplay">Customer 01</span>
+                    </div>
+
+                    <!-- Cart Selected Items Preview -->
+                    <div class="cart-summary-list" id="cartSummaryList">
+                        <div class="empty-state" style="padding:1rem 0;">No items added yet</div>
+                    </div>
+
+                    <!-- Sales Channel Options -->
+                    <div class="selection-group">
+                        <span class="selection-label">Sales Channel</span>
+                        <div class="option-cards" id="channelOptions">
+                            <div class="option-card selected" data-value="On Shop" onclick="selectChannel('On Shop')">
+                                <span>🏪</span> On Shop
+                            </div>
+                            <div class="option-card" data-value="Parcel" onclick="selectChannel('Parcel')">
+                                <span>🥡</span> Parcel
+                            </div>
+                            <div class="option-card" data-value="Online Delivery" onclick="selectChannel('Online Delivery')">
+                                <span>🛵</span> Delivery
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Method Options -->
+                    <div class="selection-group">
+                        <span class="selection-label">Payment Method</span>
+                        <div class="option-cards" id="paymentOptions">
+                            <div class="option-card selected" data-value="Cash" onclick="selectPayment('Cash')">
+                                <span>💵</span> Cash
+                            </div>
+                            <div class="option-card" data-value="GPay" onclick="selectPayment('GPay')">
+                                <span>📱</span> GPay
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Total Card -->
+                    <div class="total-box">
+                        <div class="total-row">
+                            <span>Total Amount</span>
+                            <span id="cartTotalDisplay">₹0</span>
+                        </div>
+                    </div>
+
+                    <!-- Save Action -->
+                    <button class="btn btn-primary btn-block" id="saveSaleBtn" onclick="submitCurrentSale()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        Add to Today's Sales
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================================================
+           TODAY'S SALES & ANALYTICS SECTION
+           ========================================================================== -->
+        <section id="todays-sales" style="margin-bottom: 3rem;">
+            <div class="section-title">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                Today's Sales (<span id="currentDateDisplay"></span>)
+            </div>
+            <div class="section-subtitle">Real-time log of orders completed today with export capabilities and analytics.</div>
+
+            <!-- Filter Toolbar -->
+            <div class="filter-bar">
+                <select id="filterCustomer" class="form-control" onchange="renderTodaysSales()">
+                    <option value="ALL">All Customers</option>
+                </select>
+                <select id="filterChannel" class="form-control" onchange="renderTodaysSales()">
+                    <option value="ALL">All Channels</option>
+                    <option value="On Shop">On Shop</option>
+                    <option value="Parcel">Parcel</option>
+                    <option value="Online Delivery">Online Delivery</option>
+                </select>
+                <select id="filterPayment" class="form-control" onchange="renderTodaysSales()">
+                    <option value="ALL">All Payment Methods</option>
+                    <option value="Cash">Cash</option>
+                    <option value="GPay">GPay</option>
+                </select>
+                <button class="btn btn-natural btn-sm" onclick="exportToCSV()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Export Excel / CSV
+                </button>
+                <button class="btn btn-secondary btn-sm" onclick="exportToWhatsApp()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                    Send to WhatsApp
+                </button>
+            </div>
+
+            <!-- Sales Record Data Table -->
+            <div class="sales-table-wrapper">
+                <table class="sales-table">
+                    <thead>
+                        <tr>
+                            <th>Sale #</th>
+                            <th>Time</th>
+                            <th>Customer</th>
+                            <th>Products</th>
+                            <th>Channel</th>
+                            <th>Payment</th>
+                            <th>Amount</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="salesTableBody">
+                        <!-- Sales rows generated by JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Visual Analytics Grid -->
+            <div class="analytics-grid">
+                <!-- Sales by Channel -->
+                <div class="card">
+                    <div style="font-weight:700; margin-bottom:1rem; color:var(--primary);">Sales by Channel</div>
+                    <div id="analyticsChannelBars"></div>
+                </div>
+
+                <!-- Sales by Payment -->
+                <div class="card">
+                    <div style="font-weight:700; margin-bottom:1rem; color:var(--primary);">Sales by Payment Method</div>
+                    <div id="analyticsPaymentBars"></div>
+                </div>
+
+                <!-- Top Selling Items -->
+                <div class="card">
+                    <div style="font-weight:700; margin-bottom:1rem; color:var(--primary);">Top Selling Products</div>
+                    <div id="analyticsTopProducts"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================================================
+           PRODUCTS GALLERY SECTION
+           ========================================================================== -->
+        <section id="products" style="margin-bottom: 3rem;">
+            <div class="section-title">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                Available Products Menu
+            </div>
+            <div class="section-subtitle">Food menu and store catalog items available for fast billing.</div>
+
+            <div class="catalog-grid" id="catalogGrid">
+                <!-- Catalog items rendered by JS -->
+            </div>
+        </section>
+
+        <!-- ==========================================================================
+           SETTINGS / DATA MANAGEMENT SECTION
+           ========================================================================== -->
+        <section id="settings" class="card" style="margin-top:2rem;">
+            <div style="font-weight:700; font-size:1.1rem; color:var(--primary); margin-bottom:0.5rem;">Data Management & Administration</div>
+            <p style="font-size:0.85rem; color:var(--outline); opacity:0.8; margin-bottom:1rem;">Perform backup exports or clear local session states.</p>
+            <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+                <button class="btn btn-outline btn-sm" onclick="exportToCSV()">Download All Sales CSV</button>
+                <button class="btn btn-outline btn-sm" onclick="confirmClearTodaySales()">Clear Today's Sales</button>
+                <button class="btn btn-outline btn-sm" onclick="confirmResetCustomers()">Reset Customer Names</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- ==========================================================================
+       FOOTER SECTION
+       ========================================================================== -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <strong style="color:var(--primary); font-size:1.1rem;">Store Sales Manager</strong>
+                    <p style="margin-top:0.5rem; opacity:0.8;">Simple, fast, and trustworthy store sales management software engineered for high-frequency retail environments.</p>
+                </div>
+                <div>
+                    <strong>Quick Links</strong>
+                    <div style="display:flex; flex-direction:column; gap:0.25rem; margin-top:0.5rem;">
+                        <a href="#home" style="color:inherit;">Home Dashboard</a>
+                        <a href="#pos" style="color:inherit;">Record Sale</a>
+                        <a href="#todays-sales" style="color:inherit;">Today's Sales</a>
+                        <a href="#products" style="color:inherit;">Products Menu</a>
+                    </div>
+                </div>
+                <div>
+                    <strong>System Info</strong>
+                    <p style="margin-top:0.5rem; opacity:0.8;">Single-File Offline Web Application<br>Version 1.0.0<br>Target Contact: +91 8489492406</p>
+                </div>
+            </div>
+            <div style="text-align:center; padding-top:1rem; border-top:1px solid var(--border-light); opacity:0.7;">
+                &copy; 2026 Store Sales Manager. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- ==========================================================================
+       MODAL DIALOGS
+       ========================================================================== -->
+    <!-- Generic Reusable Modal -->
+    <div class="modal-overlay" id="appModalOverlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <strong id="modalTitle">Notice</strong>
+                <button onclick="closeModal()" style="background:none; border:none; font-size:1.25rem; cursor:pointer;">&times;</button>
+            </div>
+            <div id="modalBody" style="font-size:0.95rem; line-height:1.4;">
+                <!-- Content injected dynamically -->
+            </div>
+            <div class="modal-footer" id="modalFooter">
+                <button class="btn btn-outline btn-sm" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ==========================================================================
+       JAVASCRIPT APPLICATION ENGINE
+       ========================================================================== -->
+    <script>
+        /* ==========================================================================
+           1. INITIALIZATION & STATE MANAGEMENT
+           ========================================================================== */
+        const TARGET_WHATSAPP = "918489492406";
+
+        // Initial Sample Products Dataset
+        const DEFAULT_PRODUCTS = [
+            { id: 'p1', name: 'Idli', price: 10, desc: 'Soft steamed rice cakes', image: 'assets/idli.jpg' },
+            { id: 'p2', name: 'Dosa', price: 30, desc: 'Crispy golden rice crepes', image: 'assets/dosa.jpg' },
+            { id: 'p3', name: 'Vada', price: 15, desc: 'Crispy lentil fritters', image: 'assets/vada.jpg' },
+            { id: 'p4', name: 'Poori', price: 35, desc: 'Fluffy fried bread with curry', image: 'assets/poori.jpg' },
+            { id: 'p5', name: 'Meals', price: 80, desc: 'Full traditional South Indian meal', image: 'assets/meals.jpg' },
+            { id: 'p6', name: 'Parotta', price: 20, desc: 'Layered flaky flatbread', image: 'assets/parotta.jpg' },
+            { id: 'p7', name: 'Chapati', price: 15, desc: 'Whole wheat flatbread', image: 'assets/chapati.jpg' },
+            { id: 'p8', name: 'Biryani', price: 120, desc: 'Aromatic spiced rice dish', image: 'assets/biryani.jpg' },
+            { id: 'p9', name: 'Samosa', price: 12, desc: 'Crispy pastry with savory filling', image: 'assets/samosa.jpg' },
+            { id: 'p10', name: 'Tea', price: 10, desc: 'Hot spiced milk tea', image: 'assets/tea.jpg' },
+            { id: 'p11', name: 'Coffee', price: 15, desc: 'Freshly brewed filter coffee', image: 'assets/coffee.jpg' }
+        ];
+
+        // Application State
+        let state = {
+            customers: {},          // Map of id -> { id, name }
+            customerCarts: {},      // Map of custId -> { items: { prodId: qty }, channel: 'On Shop', payment: 'Cash' }
+            activeCustomerId: 'c1', // Currently selected customer slot
+            products: DEFAULT_PRODUCTS,
+            salesRecords: [],       // Array of completed sale objects
+            editingSaleId: null     // ID of sale being edited if any
+        };
+
+        // Date String Formatting Helper (YYYY-MM-DD)
+        function getTodayDateString() {
+            const today = new Date();
+            return today.toISOString().split('T')[0];
+        }
+
+        function formatDisplayTime(dateObj) {
+            return dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        /* ==========================================================================
+           2. LOCAL STORAGE CONTROLLER
+           ========================================================================== */
+        function saveData() {
+            try {
+                localStorage.setItem('ssm_customers', JSON.stringify(state.customers));
+                localStorage.setItem('ssm_carts', JSON.stringify(state.customerCarts));
+                localStorage.setItem('ssm_sales_' + getTodayDateString(), JSON.stringify(state.salesRecords));
+            } catch (e) {
+                console.error("Failed to save state to localStorage", e);
+            }
+        }
+
+        function loadData() {
+            // Load or initialize customers (50 slots)
+            const savedCustomers = localStorage.getItem('ssm_customers');
+            if (savedCustomers) {
+                state.customers = JSON.parse(savedCustomers);
+            } else {
+                for (let i = 1; i <= 50; i++) {
+                    const id = 'c' + i;
+                    const numStr = i < 10 ? '0' + i : '' + i;
+                    state.customers[id] = { id: id, name: 'Customer ' + numStr };
+                }
+            }
+
+            // Initialize active carts for 50 customers if not present
+            const savedCarts = localStorage.getItem('ssm_carts');
+            if (savedCarts) {
+                state.customerCarts = JSON.parse(savedCarts);
+            } else {
+                for (let id in state.customers) {
+                    state.customerCarts[id] = {
+                        items: {},
+                        channel: 'On Shop',
+                        payment: 'Cash'
+                    };
+                }
+            }
+
+            // Load Sales for Today
+            const savedSales = localStorage.getItem('ssm_sales_' + getTodayDateString());
+            if (savedSales) {
+                state.salesRecords = JSON.parse(savedSales);
+            } else {
+                state.salesRecords = [];
+            }
+        }
+
+        /* ==========================================================================
+           3. INTERFACE RENDERERS & CONTROLLERS
+           ========================================================================== */
+        function initializeApp() {
+            loadData();
+            setupHeaderNavigation();
+            renderCustomerPills();
+            renderPosProducts();
+            renderCheckoutPanel();
+            renderTodaysSales();
+            renderCatalog();
+            updateDashboard();
+
+            // Set current date display
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDateDisplay').textContent = new Date().toLocaleDateString(undefined, options);
+        }
+
+        // Header Navigation & Mobile Drawer Setup
+        function setupHeaderNavigation() {
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            const drawerCloseBtn = document.getElementById('drawerCloseBtn');
+            const drawerOverlay = document.getElementById('drawerOverlay');
+            const mobileDrawer = document.getElementById('mobileDrawer');
+
+            function openDrawer() {
+                mobileDrawer.classList.add('active');
+                drawerOverlay.classList.add('active');
+            }
+
+            function closeDrawer() {
+                mobileDrawer.classList.remove('active');
+                drawerOverlay.classList.remove('active');
+            }
+
+            if (hamburgerBtn) hamburgerBtn.addEventListener('click', openDrawer);
+            if (drawerCloseBtn) drawerCloseBtn.addEventListener('click', closeDrawer);
+            if (drawerOverlay) drawerOverlay.addEventListener('click', closeDrawer);
+
+            document.querySelectorAll('.mobile-nav-link').forEach(link => {
+                link.addEventListener('click', closeDrawer);
+            });
+        }
+
+        // Render Customer Selection Pills
+        function renderCustomerPills() {
+            const container = document.getElementById('customerPillGrid');
+            container.innerHTML = '';
+
+            for (let i = 1; i <= 50; i++) {
+                const id = 'c' + i;
+                const cust = state.customers[id];
+                const cart = state.customerCarts[id];
+
+                // Calculate unsaved order total for badge
+                let cartItemCount = 0;
+                if (cart && cart.items) {
+                    for (let pId in cart.items) {
+                        cartItemCount += cart.items[pId];
+                    }
+                }
+
+                const pill = document.createElement('div');
+                pill.className = `customer-pill ${state.activeCustomerId === id ? 'active' : ''}`;
+                pill.onclick = () => selectCustomer(id);
+
+                let badgeHtml = cartItemCount > 0 ? `<span class="badge">${cartItemCount}</span>` : '';
+                pill.innerHTML = `<span>${cust.name}</span>${badgeHtml}`;
+
+                container.appendChild(pill);
+            }
+
+            // Populate Customer Filter Select Dropdown
+            const filterSelect = document.getElementById('filterCustomer');
+            filterSelect.innerHTML = '<option value="ALL">All Customers</option>';
+            for (let id in state.customers) {
+                const option = document.createElement('option');
+                option.value = state.customers[id].name;
+                option.textContent = state.customers[id].name;
+                filterSelect.appendChild(option);
+            }
+        }
+
+        function selectCustomer(custId) {
+            state.activeCustomerId = custId;
+            renderCustomerPills();
+            renderPosProducts();
+            renderCheckoutPanel();
+        }
+
+        function promptRenameCustomer() {
+            const currentCust = state.customers[state.activeCustomerId];
+            const newName = prompt("Enter custom name for " + currentCust.name + ":", currentCust.name);
+            if (newName && newName.trim() !== "") {
+                state.customers[state.activeCustomerId].name = newName.trim();
+                saveData();
+                renderCustomerPills();
+                renderCheckoutPanel();
+                renderTodaysSales();
+                showToast("Customer renamed successfully");
+            }
+        }
+
+        // Render POS Products Grid
+        function renderPosProducts(filterText = '') {
+            const container = document.getElementById('posProductsGrid');
+            container.innerHTML = '';
+
+            const activeCart = state.customerCarts[state.activeCustomerId].items;
+
+            const filteredProducts = state.products.filter(p => 
+                p.name.toLowerCase().includes(filterText.toLowerCase())
+            );
+
+            if (filteredProducts.length === 0) {
+                container.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;">No matching products found</div>';
+                return;
+            }
+
+            filteredProducts.forEach(prod => {
+                const qty = activeCart[prod.id] || 0;
+
+                const card = document.createElement('div');
+                card.className = `pos-product-card ${qty > 0 ? 'has-qty' : ''}`;
+                card.innerHTML = `
+                    <div class="pos-prod-info">
+                        <div class="pos-prod-name">${prod.name}</div>
+                        <div class="pos-prod-price">₹${prod.price}</div>
+                    </div>
+                    <div class="qty-controls">
+                        <button class="qty-btn" onclick="updateItemQuantity('${prod.id}', -1)" aria-label="Decrease quantity">-</button>
+                        <span class="qty-val">${qty}</span>
+                        <button class="qty-btn" onclick="updateItemQuantity('${prod.id}', 1)" aria-label="Increase quantity">+</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filterProducts() {
+            const query = document.getElementById('productSearchInput').value;
+            renderPosProducts(query);
+        }
+
+        function updateItemQuantity(productId, delta) {
+            const cart = state.customerCarts[state.activeCustomerId];
+            const currentQty = cart.items[productId] || 0;
+            const newQty = Math.max(0, currentQty + delta);
+
+            if (newQty === 0) {
+                delete cart.items[productId];
+            } else {
+                cart.items[productId] = newQty;
+            }
+
+            saveData();
+            renderPosProducts(document.getElementById('productSearchInput').value);
+            renderCheckoutPanel();
+            renderCustomerPills();
+        }
+
+        // Render Right Checkout Panel
+        function renderCheckoutPanel() {
+            const cust = state.customers[state.activeCustomerId];
+            const cart = state.customerCarts[state.activeCustomerId];
+
+            document.getElementById('activeCustomerDisplay').textContent = cust.name;
+
+            // Render Cart Summary List
+            const summaryContainer = document.getElementById('cartSummaryList');
+            summaryContainer.innerHTML = '';
+
+            let total = 0;
+            let hasItems = false;
+
+            for (let prodId in cart.items) {
+                const qty = cart.items[prodId];
+                if (qty > 0) {
+                    hasItems = true;
+                    const prod = state.products.find(p => p.id === prodId);
+                    if (prod) {
+                        const itemSubtotal = prod.price * qty;
+                        total += itemSubtotal;
+
+                        const row = document.createElement('div');
+                        row.className = 'cart-item-row';
+                        row.innerHTML = `
+                            <span>${qty} × ${prod.name}</span>
+                            <b>₹${itemSubtotal}</b>
+                        `;
+                        summaryContainer.appendChild(row);
+                    }
+                }
+            }
+
+            if (!hasItems) {
+                summaryContainer.innerHTML = '<div class="empty-state" style="padding:1rem 0;">No items added yet</div>';
+            }
+
+            document.getElementById('cartTotalDisplay').textContent = '₹' + total;
+
+            // Update Channel Selection UI
+            document.querySelectorAll('#channelOptions .option-card').forEach(card => {
+                if (card.getAttribute('data-value') === cart.channel) {
+                    card.classList.add('selected');
+                } else {
+                    card.classList.remove('selected');
+                }
+            });
+
+            // Update Payment Selection UI
+            document.querySelectorAll('#paymentOptions .option-card').forEach(card => {
+                if (card.getAttribute('data-value') === cart.payment) {
+                    card.classList.add('selected');
+                } else {
+                    card.classList.remove('selected');
+                }
+            });
+
+            // Update Submit Button Label if Editing
+            const saveBtn = document.getElementById('saveSaleBtn');
+            if (state.editingSaleId) {
+                saveBtn.innerHTML = `
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    Update Sale Record
+                `;
+            } else {
+                saveBtn.innerHTML = `
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    Add to Today's Sales
+                `;
+            }
+        }
+
+        function selectChannel(channelName) {
+            state.customerCarts[state.activeCustomerId].channel = channelName;
+            saveData();
+            renderCheckoutPanel();
+        }
+
+        function selectPayment(paymentName) {
+            state.customerCarts[state.activeCustomerId].payment = paymentName;
+            saveData();
+            renderCheckoutPanel();
+        }
+
+        /* ==========================================================================
+           4. SUBMIT, EDIT & DELETE SALES LOGIC
+           ========================================================================== */
+        function submitCurrentSale() {
+            const cust = state.customers[state.activeCustomerId];
+            const cart = state.customerCarts[state.activeCustomerId];
+
+            // Validation
+            let itemCount = 0;
+            let totalAmount = 0;
+            let itemsList = [];
+
+            for (let prodId in cart.items) {
+                const qty = cart.items[prodId];
+                if (qty > 0) {
+                    const prod = state.products.find(p => p.id === prodId);
+                    if (prod) {
+                        itemCount += qty;
+                        const subtotal = prod.price * qty;
+                        totalAmount += subtotal;
+                        itemsList.push({
+                            id: prod.id,
+                            name: prod.name,
+                            price: prod.price,
+                            qty: qty,
+                            subtotal: subtotal
+                        });
+                    }
+                }
+            }
+
+            if (itemCount === 0) {
+                showToast("Please add at least one product to the sale.", "error");
+                return;
+            }
+
+            if (!cart.channel) {
+                showToast("Please select a sales channel.", "error");
+                return;
+            }
+
+            if (!cart.payment) {
+                showToast("Please select a payment method.", "error");
+                return;
+            }
+
+            const now = new Date();
+
+            if (state.editingSaleId) {
+                // Update Existing Sale
+                const saleIdx = state.salesRecords.findIndex(s => s.id === state.editingSaleId);
+                if (saleIdx !== -1) {
+                    state.salesRecords[saleIdx] = {
+                        ...state.salesRecords[saleIdx],
+                        customerName: cust.name,
+                        items: itemsList,
+                        totalAmount: totalAmount,
+                        channel: cart.channel,
+                        payment: cart.payment,
+                        updatedAt: now.toISOString()
+                    };
+                    showToast("Sale #" + state.salesRecords[saleIdx].saleNo + " updated successfully!");
+                }
+                state.editingSaleId = null;
+            } else {
+                // Create New Sale Record
+                const saleNo = String(state.salesRecords.length + 1).padStart(3, '0');
+                const newSale = {
+                    id: 'sale_' + Date.now(),
+                    saleNo: saleNo,
+                    date: getTodayDateString(),
+                    time: formatDisplayTime(now),
+                    customerName: cust.name,
+                    customerId: cust.id,
+                    items: itemsList,
+                    totalAmount: totalAmount,
+                    channel: cart.channel,
+                    payment: cart.payment
+                };
+                state.salesRecords.unshift(newSale); // Newest first
+                showToast("Sale #" + saleNo + " added successfully!");
+            }
+
+            // Clear Current Customer Cart
+            state.customerCarts[state.activeCustomerId] = {
+                items: {},
+                channel: 'On Shop',
+                payment: 'Cash'
+            };
+
+            saveData();
+            renderCustomerPills();
+            renderPosProducts();
+            renderCheckoutPanel();
+            renderTodaysSales();
+            updateDashboard();
+        }
+
+        function editSale(saleId) {
+            const sale = state.salesRecords.find(s => s.id === saleId);
+            if (!sale) return;
+
+            // Find customer slot or use active
+            let custId = sale.customerId || state.activeCustomerId;
+            state.activeCustomerId = custId;
+
+            // Load sale items back into active customer's cart
+            const newCartItems = {};
+            sale.items.forEach(item => {
+                newCartItems[item.id] = item.qty;
+            });
+
+            state.customerCarts[custId] = {
+                items: newCartItems,
+                channel: sale.channel,
+                payment: sale.payment
+            };
+
+            state.editingSaleId = sale.id;
+
+            saveData();
+            renderCustomerPills();
+            renderPosProducts();
+            renderCheckoutPanel();
+
+            // Scroll to POS section
+            document.getElementById('pos').scrollIntoView({ behavior: 'smooth' });
+            showToast("Editing Sale #" + sale.saleNo);
+        }
+
+        function confirmDeleteSale(saleId) {
+            const sale = state.salesRecords.find(s => s.id === saleId);
+            if (!sale) return;
+
+            openModal(
+                "Confirm Deletion",
+                `Are you sure you want to delete <strong>Sale #${sale.saleNo}</strong> for ${sale.customerName} (₹${sale.totalAmount})?`,
+                `
+                    <button class="btn btn-outline btn-sm" onclick="closeModal()">Cancel</button>
+                    <button class="btn btn-primary btn-sm" onclick="deleteSale('${saleId}')">Delete Sale</button>
+                `
+            );
+        }
+
+        function deleteSale(saleId) {
+            state.salesRecords = state.salesRecords.filter(s => s.id !== saleId);
+            saveData();
+            closeModal();
+            renderTodaysSales();
+            updateDashboard();
+            showToast("Sale deleted successfully");
+        }
+
+        /* ==========================================================================
+           5. TODAY'S SALES TABLE & ANALYTICS RENDERER
+           ========================================================================== */
+        function renderTodaysSales() {
+            const tbody = document.getElementById('salesTableBody');
+            tbody.innerHTML = '';
+
+            const filterCust = document.getElementById('filterCustomer').value;
+            const filterChan = document.getElementById('filterChannel').value;
+            const filterPay = document.getElementById('filterPayment').value;
+
+            const filteredSales = state.salesRecords.filter(sale => {
+                if (filterCust !== 'ALL' && sale.customerName !== filterCust) return false;
+                if (filterChan !== 'ALL' && sale.channel !== filterChan) return false;
+                if (filterPay !== 'ALL' && sale.payment !== filterPay) return false;
+                return true;
+            });
+
+            if (filteredSales.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8">
+                            <div class="empty-state">
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                                <div>No sales recorded matching current filters</div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                renderAnalytics([]);
+                return;
+            }
+
+            filteredSales.forEach(sale => {
+                const prodSummary = sale.items.map(i => `${i.qty}× ${i.name}`).join(', ');
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><b>#${sale.saleNo}</b></td>
+                    <td>${sale.time}</td>
+                    <td>${sale.customerName}</td>
+                    <td style="max-width:200px; font-size:0.85rem;">${prodSummary}</td>
+                    <td><span class="badge-channel">${sale.channel}</span></td>
+                    <td><span class="badge-payment">${sale.payment}</span></td>
+                    <td><b>₹${sale.totalAmount}</b></td>
+                    <td>
+                        <div style="display:flex; gap:0.25rem;">
+                            <button class="btn btn-outline btn-sm" onclick="editSale('${sale.id}')" title="Edit Sale">✎</button>
+                            <button class="btn btn-outline btn-sm" onclick="confirmDeleteSale('${sale.id}')" title="Delete Sale" style="color:#A31D1D;">✕</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            renderAnalytics(state.salesRecords);
+        }
+
+        // Render Analytics Breakdowns
+        function renderAnalytics(sales) {
+            // Channel Breakdown
+            let channelTotals = { 'On Shop': 0, 'Parcel': 0, 'Online Delivery': 0 };
+            let paymentTotals = { 'Cash': 0, 'GPay': 0 };
+            let productCounts = {};
+
+            let grandTotal = 0;
+
+            sales.forEach(sale => {
+                grandTotal += sale.totalAmount;
+                if (channelTotals[sale.channel] !== undefined) {
+                    channelTotals[sale.channel] += sale.totalAmount;
+                }
+                if (paymentTotals[sale.payment] !== undefined) {
+                    paymentTotals[sale.payment] += sale.totalAmount;
+                }
+
+                sale.items.forEach(item => {
+                    productCounts[item.name] = (productCounts[item.name] || 0) + item.qty;
+                });
+            });
+
+            // Channel Bars
+            const channelContainer = document.getElementById('analyticsChannelBars');
+            channelContainer.innerHTML = '';
+            for (let ch in channelTotals) {
+                const amt = channelTotals[ch];
+                const pct = grandTotal > 0 ? Math.round((amt / grandTotal) * 100) : 0;
+                channelContainer.innerHTML += `
+                    <div class="progress-bar-container">
+                        <div class="progress-info">
+                            <span>${ch}</span>
+                            <span>₹${amt} (${pct}%)</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill primary" style="width: ${pct}%"></div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Payment Bars
+            const paymentContainer = document.getElementById('analyticsPaymentBars');
+            paymentContainer.innerHTML = '';
+            for (let pay in paymentTotals) {
+                const amt = paymentTotals[pay];
+                const pct = grandTotal > 0 ? Math.round((amt / grandTotal) * 100) : 0;
+                paymentContainer.innerHTML += `
+                    <div class="progress-bar-container">
+                        <div class="progress-info">
+                            <span>${pay}</span>
+                            <span>₹${amt} (${pct}%)</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill natural" style="width: ${pct}%"></div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Top Products
+            const topProdContainer = document.getElementById('analyticsTopProducts');
+            topProdContainer.innerHTML = '';
+            const sortedProducts = Object.keys(productCounts)
+                .map(k => ({ name: k, qty: productCounts[k] }))
+                .sort((a, b) => b.qty - a.qty)
+                .slice(0, 4);
+
+            if (sortedProducts.length === 0) {
+                topProdContainer.innerHTML = '<div style="font-size:0.85rem; opacity:0.6;">No data available</div>';
+            } else {
+                const maxQty = sortedProducts[0].qty;
+                sortedProducts.forEach(p => {
+                    const pct = Math.round((p.qty / maxQty) * 100);
+                    topProdContainer.innerHTML += `
+                        <div class="progress-bar-container">
+                            <div class="progress-info">
+                                <span>${p.name}</span>
+                                <span>${p.qty} sold</span>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-fill" style="width: ${pct}%"></div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        // Update Dynamic Header Dashboard Statistics
+        function updateDashboard() {
+            let totalSales = 0;
+            let totalOrders = state.salesRecords.length;
+            let itemsSold = 0;
+            let customersSet = new Set();
+            let cashSales = 0;
+            let gpaySales = 0;
+
+            state.salesRecords.forEach(sale => {
+                totalSales += sale.totalAmount;
+                customersSet.add(sale.customerName);
+
+                if (sale.payment === 'Cash') cashSales += sale.totalAmount;
+                if (sale.payment === 'GPay') gpaySales += sale.totalAmount;
+
+                sale.items.forEach(item => {
+                    itemsSold += item.qty;
+                });
+            });
+
+            document.getElementById('dashTotalSales').textContent = '₹' + totalSales;
+            document.getElementById('dashTotalOrders').textContent = totalOrders;
+            document.getElementById('dashItemsSold').textContent = itemsSold;
+            document.getElementById('dashCustServed').textContent = customersSet.size;
+            document.getElementById('dashCashSales').textContent = '₹' + cashSales;
+            document.getElementById('dashGPaySales').textContent = '₹' + gpaySales;
+        }
+
+        /* ==========================================================================
+           6. PRODUCTS MENU CATALOG RENDERER
+           ========================================================================== */
+        function renderCatalog() {
+            const container = document.getElementById('catalogGrid');
+            container.innerHTML = '';
+
+            state.products.forEach(prod => {
+                const card = document.createElement('div');
+                card.className = 'catalog-card';
+                card.innerHTML = `
+                    <div class="catalog-img-wrapper">
+                        <img src="${prod.image}" alt="${prod.name} food product" class="catalog-img" onerror="this.src='assets/product.jpg'; this.onerror=null;">
+                    </div>
+                    <div class="catalog-details">
+                        <div class="catalog-title">${prod.name}</div>
+                        <div class="catalog-desc">${prod.desc}</div>
+                        <div class="catalog-footer">
+                            <span class="catalog-price">₹${prod.price}</span>
+                            <button class="btn btn-primary btn-sm" onclick="quickAddProduct('${prod.id}')">+ Add</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function quickAddProduct(prodId) {
+            updateItemQuantity(prodId, 1);
+            document.getElementById('pos').scrollIntoView({ behavior: 'smooth' });
+            showToast("Added item to current order");
+        }
+
+        /* ==========================================================================
+           7. EXPORT & WHATSAPP INTEGRATION
+           ========================================================================== */
+        function generateCSVContent() {
+            if (state.salesRecords.length === 0) return null;
+
+            let csv = "Sale No,Date,Time,Customer,Product,Quantity,Sales Channel,Payment Method,Unit Price,Total Amount\n";
+
+            state.salesRecords.forEach(sale => {
+                sale.items.forEach(item => {
+                    csv += `"${sale.saleNo}","${sale.date}","${sale.time}","${sale.customerName}","${item.name}",${item.qty},"${sale.channel}","${sale.payment}",${item.price},${item.subtotal}\n`;
+                });
+            });
+
+            return csv;
+        }
+
+        function exportToCSV() {
+            const csvContent = generateCSVContent();
+            if (!csvContent) {
+                showToast("No sales records available to export.", "error");
+                return;
+            }
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Sales_Report_${getTodayDateString()}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showToast("CSV Sales Report downloaded successfully!");
+        }
+
+        function exportToWhatsApp() {
+            if (state.salesRecords.length === 0) {
+                showToast("No sales available to send.", "error");
+                return;
+            }
+
+            // Generate Local CSV Download First
+            exportToCSV();
+
+            // Construct Summary Text Message
+            let totalRev = 0;
+            state.salesRecords.forEach(s => totalRev += s.totalAmount);
+
+            const msg = `*Daily Sales Report - ${getTodayDateString()}*\n` +
+                        `Total Orders: ${state.salesRecords.length}\n` +
+                        `Total Revenue: Rs.${totalRev}\n\n` +
+                        `*Note:* Today's sales Excel/CSV report file has been downloaded to this device. Please attach the downloaded CSV file to this chat.`;
+
+            const encodedMsg = encodeURIComponent(msg);
+            const waUrl = `https://wa.me/${TARGET_WHATSAPP}?text=${encodedMsg}`;
+
+            // Open WhatsApp Chat
+            window.open(waUrl, '_blank');
+        }
+
+        /* ==========================================================================
+           8. ADMIN DATA RESET CONTROLLERS
+           ========================================================================== */
+        function confirmClearTodaySales() {
+            openModal(
+                "Clear Today's Sales",
+                "Are you sure you want to clear all sales recorded for today? This action cannot be undone.",
+                `
+                    <button class="btn btn-outline btn-sm" onclick="closeModal()">Cancel</button>
+                    <button class="btn btn-primary btn-sm" onclick="clearTodaySales()">Clear All Sales</button>
+                `
+            );
+        }
+
+        function clearTodaySales() {
+            state.salesRecords = [];
+            saveData();
+            closeModal();
+            renderTodaysSales();
+            updateDashboard();
+            showToast("Today's sales cleared.");
+        }
+
+        function confirmResetCustomers() {
+            openModal(
+                "Reset Customer Names",
+                "Are you sure you want to reset all customer slot names back to default (Customer 01 - 50)?",
+                `
+                    <button class="btn btn-outline btn-sm" onclick="closeModal()">Cancel</button>
+                    <button class="btn btn-primary btn-sm" onclick="resetCustomers()">Reset Names</button>
+                `
+            );
+        }
+
+        function resetCustomers() {
+            for (let i = 1; i <= 50; i++) {
+                const id = 'c' + i;
+                const numStr = i < 10 ? '0' + i : '' + i;
+                state.customers[id] = { id: id, name: 'Customer ' + numStr };
+            }
+            saveData();
+            closeModal();
+            renderCustomerPills();
+            renderCheckoutPanel();
+            renderTodaysSales();
+            showToast("Customer names reset to default.");
+        }
+
+        /* ==========================================================================
+           9. UI HELPER COMPONENTS (MODALS & TOASTS)
+           ========================================================================== */
+        function openModal(title, bodyHtml, footerHtml = '') {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalBody').innerHTML = bodyHtml;
+            const footer = document.getElementById('modalFooter');
+            if (footerHtml) {
+                footer.innerHTML = footerHtml;
+            } else {
+                footer.innerHTML = '<button class="btn btn-outline btn-sm" onclick="closeModal()">Close</button>';
+            }
+            document.getElementById('appModalOverlay').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('appModalOverlay').classList.remove('active');
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            if (type === 'error') {
+                toast.style.borderLeftColor = '#A31D1D';
+            }
+
+            toast.innerHTML = `
+                <span>${type === 'success' ? '✓' : '⚠️'}</span>
+                <span>${message}</span>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 3000);
+        }
+
+        // Initialize App on DOM Load
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+</body>
+</html>
