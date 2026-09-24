@@ -519,7 +519,7 @@
             box-shadow: var(--shadow-sm);
         }
 
-        .qty-btn:hover {
+        .qty-btn:hover:not(:disabled) {
             background: var(--primary);
             color: #FFFFFF;
         }
@@ -1111,9 +1111,6 @@
                             <div class="option-card selected" data-value="On Shop" onclick="selectChannel('On Shop')">
                                 <span>🏪</span> On Shop
                             </div>
-                            <div class="option-card" data-value="Parcel" onclick="selectChannel('Parcel')">
-                                <span>🥡</span> Parcel
-                            </div>
                             <div class="option-card" data-value="Online Delivery" onclick="selectChannel('Online Delivery')">
                                 <span>🛵</span> Delivery
                             </div>
@@ -1168,7 +1165,6 @@
                 <select id="filterChannel" class="form-control" onchange="renderTodaysSales()">
                     <option value="ALL">All Channels</option>
                     <option value="On Shop">On Shop</option>
-                    <option value="Parcel">Parcel</option>
                     <option value="Online Delivery">Online Delivery</option>
                 </select>
                 <select id="filterPayment" class="form-control" onchange="renderTodaysSales()">
@@ -1237,7 +1233,7 @@
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
                 Available Products Menu
             </div>
-            <div class="section-subtitle">Food menu and store catalog items available for fast billing.</div>
+            <div class="section-subtitle">Food menu and daily item stock count management. Update daily quantities below.</div>
 
             <div class="catalog-grid" id="catalogGrid">
                 <!-- Catalog items rendered by JS -->
@@ -1319,20 +1315,23 @@
            ========================================================================== */
         const TARGET_WHATSAPP = "918489492406";
 
-        // Initial Sample Products Dataset
+        // Initial Sample Products Dataset with Default Daily Stock Count
         const DEFAULT_PRODUCTS = [
-            { id: 'p1', name: 'அரிசி மாவு', price: 15, desc: 'Soft steamed rice cakes', image: 'assets/idli.jpg' },
-            { id: 'p2', name: 'கேப்பை', price: 20, desc: 'Crispy golden rice crepes', image: 'assets/dosa.jpg' },
-            { id: 'p3', name: 'மாப்பிள்ளை சம்பா', price: 25, desc: 'Crispy lentil fritters', image: 'assets/vada.jpg' },
-            { id: 'p4', name: 'குதிரைவாலி', price: 25, desc: 'Fluffy fried bread with curry', image: 'assets/poori.jpg' },
-            { id: 'p5', name: 'கருப்பு கவுனி', price: 25, desc: 'Full traditional South Indian meal', image: 'assets/meals.jpg' },
-            { id: 'p6', name: 'பனை ஓலை', price: 20, desc: 'Layered flaky flatbread', image: 'assets/parotta.jpg' },
-            { id: 'p7', name: 'பால் கொழுக்கட்டை', price: 40, desc: 'Whole wheat flatbread', image: 'assets/chapati.jpg' },
-            { id: 'p8', name: 'கார கொழுக்கட்டை', price: 20, desc: 'Aromatic spiced rice dish', image: 'assets/biryani.jpg' },
-            { id: 'p9', name: 'தேங்காய் பால்', price: 30, desc: 'Crispy pastry with savory filling', image: 'assets/samosa.jpg' },
-            { id: 'p10', name: 'கேரட்', price: 40, desc: 'Hot spiced milk tea', image: 'assets/tea.jpg' },
-            { id: 'p11', name: 'பீட்ரூட்', price: 40, desc: 'Freshly brewed filter coffee', image: 'assets/coffee.jpg' },
-            { id: 'p12', name: 'parcel', price: 5, desc: 'Freshly brewed filter coffee', image: 'assets/coffee.jpg' }
+            { id: 'p1', name: 'அரிசி மாவு', price: 15, desc: 'Soft steamed rice cakes', image: 'assets/idli.jpg', stock: 50 },
+            { id: 'p2', name: 'கேப்பை', price: 20, desc: 'Crispy golden rice crepes', image: 'assets/dosa.jpg', stock: 50 },
+            { id: 'p3', name: 'மாப்பிள்ளை சம்பா', price: 25, desc: 'Crispy lentil fritters', image: 'assets/vada.jpg', stock: 50 },
+            { id: 'p4', name: 'குதிரைவாலி', price: 25, desc: 'Fluffy fried bread with curry', image: 'assets/poori.jpg', stock: 50 },
+            { id: 'p5', name: 'கருப்பு கவுனி', price: 25, desc: 'Full traditional South Indian meal', image: 'assets/meals.jpg', stock: 50 },
+            { id: 'p6', name: 'பனை ஓலை', price: 20, desc: 'Layered flaky flatbread', image: 'assets/parotta.jpg', stock: 50 },
+            { id: 'p7', name: 'கார கொழுக்கட்டை', price: 20, desc: 'Aromatic spiced rice dish', image: 'assets/biryani.jpg', stock: 50 },
+            { id: 'p8', name: 'பால் கொழுக்கட்டை', price: 40, desc: 'Whole wheat flatbread', image: 'assets/chapati.jpg', stock: 50 },
+            { id: 'p9', name: 'பால் கொழுக்கட்டை(parcel)', price: 45, desc: 'Whole wheat flatbread', image: 'assets/chapati.jpg', stock: 50 },
+            { id: 'p10', name: 'தேங்காய் பால்', price: 30, desc: 'Crispy pastry with savory filling', image: 'assets/samosa.jpg', stock: 50 },
+            { id: 'p11', name: 'தேங்காய் பால்(parcel)', price: 35, desc: 'Crispy pastry with savory filling', image: 'assets/samosa.jpg', stock: 50 },
+            { id: 'p12', name: 'கேரட் தேங்காய் பால்', price: 40, desc: 'Hot spiced milk tea', image: 'assets/tea.jpg', stock: 50 },
+            { id: 'p13', name: 'கேரட் தேங்காய் பால்(parcel)', price: 45, desc: 'Freshly brewed filter coffee', image: 'assets/coffee.jpg', stock: 50 },
+            { id: 'p14', name: 'பீட்ரூட் தேங்காய் பால்', price: 40, desc: 'Freshly brewed filter coffee', image: 'assets/coffee.jpg', stock: 50 },
+            { id: 'p15', name: 'பீட்ரூட் தேங்காய் பால்(parcel)', price: 45, desc: 'Freshly brewed filter coffee', image: 'assets/coffee.jpg', stock: 50 }
         ];
 
         // Application State
@@ -1362,6 +1361,7 @@
             try {
                 localStorage.setItem('ssm_customers', JSON.stringify(state.customers));
                 localStorage.setItem('ssm_carts', JSON.stringify(state.customerCarts));
+                localStorage.setItem('ssm_products', JSON.stringify(state.products));
                 localStorage.setItem('ssm_sales_' + getTodayDateString(), JSON.stringify(state.salesRecords));
             } catch (e) {
                 console.error("Failed to save state to localStorage", e);
@@ -1379,6 +1379,14 @@
                     const numStr = i < 10 ? '0' + i : '' + i;
                     state.customers[id] = { id: id, name: 'Customer ' + numStr };
                 }
+            }
+
+            // Load products stock state if saved
+            const savedProducts = localStorage.getItem('ssm_products');
+            if (savedProducts) {
+                state.products = JSON.parse(savedProducts);
+            } else {
+                state.products = DEFAULT_PRODUCTS;
             }
 
             // Initialize active carts for 50 customers if not present
@@ -1525,6 +1533,7 @@
 
             filteredProducts.forEach(prod => {
                 const qty = activeCart[prod.id] || 0;
+                const isSoldOut = prod.stock <= 0;
 
                 const card = document.createElement('div');
                 card.className = `pos-product-card ${qty > 0 ? 'has-qty' : ''}`;
@@ -1532,11 +1541,14 @@
                     <div class="pos-prod-info">
                         <div class="pos-prod-name">${prod.name}</div>
                         <div class="pos-prod-price">₹${prod.price}</div>
+                        <div style="font-size:0.75rem; margin-top:2px;">
+                            ${isSoldOut ? '<span style="color:#A31D1D; font-weight:700;">Sold Out</span>' : `<span style="color:var(--natural); font-weight:600;">Stock: ${prod.stock}</span>`}
+                        </div>
                     </div>
                     <div class="qty-controls">
                         <button class="qty-btn" onclick="updateItemQuantity('${prod.id}', -1)" aria-label="Decrease quantity">-</button>
                         <span class="qty-val">${qty}</span>
-                        <button class="qty-btn" onclick="updateItemQuantity('${prod.id}', 1)" aria-label="Increase quantity">+</button>
+                        <button class="qty-btn" onclick="updateItemQuantity('${prod.id}', 1)" ${isSoldOut ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''} aria-label="Increase quantity">+</button>
                     </div>
                 `;
                 container.appendChild(card);
@@ -1550,7 +1562,20 @@
 
         function updateItemQuantity(productId, delta) {
             const cart = state.customerCarts[state.activeCustomerId];
+            const prod = state.products.find(p => p.id === productId);
             const currentQty = cart.items[productId] || 0;
+
+            if (delta > 0 && prod) {
+                if (prod.stock <= 0) {
+                    showToast(prod.name + " is Sold Out!", "error");
+                    return;
+                }
+                if (currentQty + 1 > prod.stock) {
+                    showToast("Stock limit reached for " + prod.name + " (" + prod.stock + " available)", "error");
+                    return;
+                }
+            }
+
             const newQty = Math.max(0, currentQty + delta);
 
             if (newQty === 0) {
@@ -1698,6 +1723,14 @@
 
             const now = new Date();
 
+            // Deduct stock for sold items
+            itemsList.forEach(item => {
+                const prod = state.products.find(p => p.id === item.id);
+                if (prod) {
+                    prod.stock = Math.max(0, prod.stock - item.qty);
+                }
+            });
+
             if (state.editingSaleId) {
                 // Update Existing Sale
                 const saleIdx = state.salesRecords.findIndex(s => s.id === state.editingSaleId);
@@ -1745,6 +1778,7 @@
             renderPosProducts();
             renderCheckoutPanel();
             renderTodaysSales();
+            renderCatalog();
             updateDashboard();
         }
 
@@ -1864,7 +1898,7 @@
         // Render Analytics Breakdowns
         function renderAnalytics(sales) {
             // Channel Breakdown
-            let channelTotals = { 'On Shop': 0, 'Parcel': 0, 'Online Delivery': 0 };
+            let channelTotals = { 'On Shop': 0, 'Online Delivery': 0 };
             let paymentTotals = { 'Cash': 0, 'GPay': 0 };
             let productCounts = {};
 
@@ -1981,25 +2015,36 @@
         }
 
         /* ==========================================================================
-           6. PRODUCTS MENU CATALOG RENDERER
+           6. PRODUCTS MENU CATALOG RENDERER & DAILY STOCK MANAGEMENT
            ========================================================================== */
         function renderCatalog() {
             const container = document.getElementById('catalogGrid');
             container.innerHTML = '';
 
             state.products.forEach(prod => {
+                const isSoldOut = prod.stock <= 0;
                 const card = document.createElement('div');
                 card.className = 'catalog-card';
                 card.innerHTML = `
-                    <div class="catalog-img-wrapper">
+                    <div class="catalog-img-wrapper" style="position:relative;">
                         <img src="${prod.image}" alt="${prod.name} food product" class="catalog-img" onerror="this.src='assets/product.jpg'; this.onerror=null;">
+                        ${isSoldOut ? '<span style="position:absolute; top:8px; right:8px; background:#A31D1D; color:#FFFFFF; padding:2px 8px; border-radius:12px; font-size:0.75rem; font-weight:700;">Sold Out</span>' : ''}
                     </div>
                     <div class="catalog-details">
                         <div class="catalog-title">${prod.name}</div>
                         <div class="catalog-desc">${prod.desc}</div>
+                        
+                        <!-- Daily Stock Count Entry -->
+                        <div style="margin-bottom:0.75rem; background:var(--surface-muted); padding:0.5rem; border-radius:var(--radius-sm); border:1px solid var(--border-light);">
+                            <label style="font-size:0.75rem; font-weight:700; color:var(--outline); display:block; margin-bottom:0.25rem;">Daily Stock Count:</label>
+                            <input type="number" min="0" value="${prod.stock}" class="form-control" style="padding:0.25rem 0.5rem; font-size:0.85rem;" onchange="updateProductStock('${prod.id}', this.value)" title="Set Daily Stock Count">
+                        </div>
+
                         <div class="catalog-footer">
                             <span class="catalog-price">₹${prod.price}</span>
-                            <button class="btn btn-primary btn-sm" onclick="quickAddProduct('${prod.id}')">+ Add</button>
+                            <button class="btn btn-primary btn-sm" onclick="quickAddProduct('${prod.id}')" ${isSoldOut ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}>
+                                ${isSoldOut ? 'Sold Out' : '+ Add'}
+                            </button>
                         </div>
                     </div>
                 `;
@@ -2007,7 +2052,24 @@
             });
         }
 
+        function updateProductStock(prodId, newCount) {
+            const val = parseInt(newCount);
+            const prod = state.products.find(p => p.id === prodId);
+            if (prod) {
+                prod.stock = isNaN(val) || val < 0 ? 0 : val;
+                saveData();
+                renderPosProducts();
+                renderCatalog();
+                showToast("Stock count updated for " + prod.name);
+            }
+        }
+
         function quickAddProduct(prodId) {
+            const prod = state.products.find(p => p.id === prodId);
+            if (prod && prod.stock <= 0) {
+                showToast(prod.name + " is Sold Out!", "error");
+                return;
+            }
             updateItemQuantity(prodId, 1);
             document.getElementById('pos').scrollIntoView({ behavior: 'smooth' });
             showToast("Added item to current order");
